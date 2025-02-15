@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import Square from './Square';
 
-function Board({ size }) {
+function Board({ size, onReset }) {
   const [squares, setSquares] = useState(Array(size * size).fill(null));
   const [isXNext, setIsXNext] = useState(true);
   const [winner, setWinner] = useState(null);
 
   const handleClick = (i) => {
     const newSquares = squares.slice();
-    if (calculateWinner(newSquares) || newSquares[i]) {
+    if (calculateWinner(newSquares, size) || newSquares[i]) {
       return;
     }
     newSquares[i] = isXNext ? '❌' : '🟢';
@@ -48,6 +48,7 @@ function Board({ size }) {
       <div className="board">
         <div className="status">{status}</div>
         {renderBoard()}
+        <button className="reset-button" onClick={onReset}>Reset</button>
       </div>
       <div className={`player player-o ${!isXNext && !winner ? 'active' : 'inactive'}`}>
         Jogador 🟢
@@ -58,29 +59,46 @@ function Board({ size }) {
 }
 
 function calculateWinner(squares, size) {
-  // Implementar lógica para verificar o vencedor em um tabuleiro de qualquer tamanho
-  // Por simplicidade, aqui vamos manter a lógica do 3x3 e deixamos para você aprimorar
+  const lines = [];
 
-  if (size === 3) {
-    const lines = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [0, 4, 8],
-      [2, 4, 6],
-    ];
-    for (let i = 0; i < lines.length; i++) {
-      const [a, b, c] = lines[i];
-      if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-        return squares[a];
-      }
+  // Linhas
+  for (let i = 0; i < size; i++) {
+    const row = [];
+    for (let j = 0; j < size; j++) {
+      row.push(i * size + j);
     }
+    lines.push(row);
   }
 
-  // A lógica para um tabuleiro 5x5 ou maior precisa ser implementada
+  // Colunas
+  for (let i = 0; i < size; i++) {
+    const col = [];
+    for (let j = 0; j < size; j++) {
+      col.push(j * size + i);
+    }
+    lines.push(col);
+  }
+
+  // Diagonais
+  const diag1 = [];
+  const diag2 = [];
+  for (let i = 0; i < size; i++) {
+    diag1.push(i * size + i);
+    diag2.push(i * size + (size - i - 1));
+  }
+  lines.push(diag1);
+  lines.push(diag2);
+
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c, d, e] = lines[i];
+    if (
+      squares[a] && squares[a] === squares[b] &&
+      squares[a] === squares[c] && squares[a] === squares[d] &&
+      squares[a] === squares[e]
+    ) {
+      return squares[a];
+    }
+  }
   return null;
 }
 

@@ -10,13 +10,17 @@ function App() {
     setBoardSize(size);
   };
 
+  const handleReset = () => {
+    setBoardSize(null);
+  };
+
   return (
     <div className="App">
       <h1>Jogo da Velha</h1>
       {!boardSize ? (
         <DifficultySelection onSelect={handleSelectDifficulty} />
       ) : (
-        <Board size={boardSize} />
+        <Board size={boardSize} onReset={handleReset} />
       )}
     </div>
   );
